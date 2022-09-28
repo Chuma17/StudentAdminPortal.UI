@@ -92,8 +92,14 @@
           </div>
         </div>
 
-        <button class="btn btn-primary mb-4" (click)="onUpdate()">Save</button>
+        <div class="row">
+          <div class="col-xs-12 d-flex justify-content-between">
+            <button class="btn btn-primary mb-4" (click)="onUpdate()">Save</button>
+            <button class="btn btn-danger mb-4" (click)="onDelete()">Delete</button>
+          </div>
+        </div>
       </form>
+
     </div>
 
     <div class="col-xs-6">
