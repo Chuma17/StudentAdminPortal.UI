@@ -13,7 +13,6 @@ import { StudentService } from '../student.service';
 })
 export class ViewStudentComponent implements OnInit {
   studentId: string | null | undefined;
-
   student: Student = {
     id: '',
     firstName: '',
@@ -34,6 +33,9 @@ export class ViewStudentComponent implements OnInit {
     }
   };
 
+  header = '';
+  isNewStudent = false;
+
   genderList: Gender[] = [];
 
   constructor(private readonly studentService: StudentService,
@@ -48,56 +50,86 @@ export class ViewStudentComponent implements OnInit {
         this.studentId = params.get('id');
 
         if (this.studentId) {
-          this.studentService.getStudent(this.studentId)
-          .subscribe(
-            (successResponse) => {
-              this.student = successResponse;
-            }
-          );
+
+          if (this.studentId.toLowerCase() === 'Add'.toLowerCase()) {
+            // new student functionality
+            this.isNewStudent = true;
+            this.header = 'Add New Student';
+          }
+          else {
+            // Existing student functionality
+            this.isNewStudent = false;
+            this.header = 'Edit Student';
+
+            this.studentService.getStudent(this.studentId)
+              .subscribe(
+                (successResponse) => {
+                  this.student = successResponse;
+                }
+              );
+          }
 
           this.genderService.getGenderList()
-          .subscribe(
-            (successResponse) => {
-              this.genderList = successResponse;
-            }
-          );
+            .subscribe(
+              (successResponse) => {
+                this.genderList = successResponse;
+              }
+            );
         }
       }
     )
   }
 
-  onUpdate(): void{
+  onUpdate(): void {
     this.studentService.updateStudent(this.student.id, this.student)
-    .subscribe(
-      (successResponse) => {
-        //show a notification
-        this.snackbar.open("Student Updated Successfully", undefined, {
-          duration: 2000
-        });
-      },
-      (errorResponse) => {
-        //Log it
-      }
-    );
+      .subscribe(
+        (successResponse) => {
+          //show a notification
+          this.snackbar.open("Student Updated Successfully", undefined, {
+            duration: 2000
+          });
+        },
+        (errorResponse) => {
+          //Log it
+        }
+      );
   }
 
-  onDelete(): void{
+  onDelete(): void {
     this.studentService.deleteStudent(this.student.id)
-    .subscribe(
-      (successResponse) => {
-        this.snackbar.open("Student Deleted Successfully", undefined, {
-          duration: 1000
-        });
+      .subscribe(
+        (successResponse) => {
+          this.snackbar.open("Student Deleted Successfully", undefined, {
+            duration: 1000
+          });
 
-        setTimeout(() => {
-          this.router.navigateByUrl('students');
-        }, 1000);
-      },
+          setTimeout(() => {
+            this.router.navigateByUrl('students');
+          }, 1000);
+        },
 
-      (errorResponse) => {
+        (errorResponse) => {
 
-      }
-    )
+        }
+      )
+  }
+
+  onAdd(): void {
+    this.studentService.addStudent(this.student)
+      .subscribe(
+        (successResponse) => {
+          this.snackbar.open("Student Added Successfully", undefined, {
+            duration: 1000
+          });
+
+          setTimeout(() => {
+            this.router.navigateByUrl(`students/${successResponse.id}`);
+          }, 1000);
+        },
+        (errorResponse) => {
+
+        }
+      )
   }
 
 }
